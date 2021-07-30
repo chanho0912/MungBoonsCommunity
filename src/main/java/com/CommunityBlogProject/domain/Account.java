@@ -9,7 +9,7 @@ import java.util.UUID;
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
 @Builder @AllArgsConstructor @NoArgsConstructor
-public class account {
+public class Account {
 
     @Id @GeneratedValue
     private Long id;
