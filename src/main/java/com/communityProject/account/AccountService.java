@@ -1,6 +1,8 @@
 package com.communityProject.account;
 
 import com.communityProject.domain.Account;
+import com.communityProject.settings.form.Notifications;
+import com.communityProject.settings.form.Profile;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
@@ -86,5 +88,26 @@ public class AccountService implements UserDetailsService {
 
     public void resendConfirmEmailToken(Account account) {
         sendSignUpConfirmEmail(account);
+    }
+
+    public void updateProfile(Account account, Profile profile) {
+        modelMapper.map(profile, account);
+        accountRepository.save(account);
+    }
+
+    public void updatePassword(Account account, String newPassword) {
+        account.setPassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);
+    }
+
+    public void updateNotifications(Account account, Notifications notifications) {
+        modelMapper.map(notifications, account);
+        accountRepository.save(account);
+    }
+
+    public void updateNickname(Account account, String nickname) {
+        account.setNickname(nickname);
+        accountRepository.save(account);
+        login(account);
     }
 }
