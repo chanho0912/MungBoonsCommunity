@@ -1,4 +1,4 @@
-package com.CommunityBlogProject.domain;
+package com.communityProject.domain;
 
 import lombok.*;
 

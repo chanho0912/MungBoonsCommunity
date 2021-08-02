@@ -1,6 +1,6 @@
-package com.CommunityBlogProject.account;
+package com.communityProject.account;
 
-import com.CommunityBlogProject.domain.Account;
+import com.communityProject.domain.Account;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

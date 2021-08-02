@@ -1,4 +1,4 @@
-package com.CommunityBlogProject.account;
+package com.communityProject.account;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

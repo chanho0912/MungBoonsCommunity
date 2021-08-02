@@ -1,6 +1,6 @@
-package com.CommunityBlogProject.account;
+package com.communityProject.account;
 
-import com.CommunityBlogProject.domain.Account;
+import com.communityProject.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,7 +1,7 @@
-package com.CommunityBlogProject.main;
+package com.communityProject.main;
 
-import com.CommunityBlogProject.account.CurrentUser;
-import com.CommunityBlogProject.domain.Account;
+import com.communityProject.account.CurrentUser;
+import com.communityProject.domain.Account;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +16,7 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping("/login")
     public String login() {
         return "login";
     }
