@@ -1,3 +1,7 @@
+/*
+step 1 : Tasks - application - npm-Install ( node, npm / needs to install using before. )
+step 2 : Tasks - application - bootRun or any type of running u want.
+*/
 buildscript{
     ext {
         springBootVersion = '2.5.2'
@@ -5,6 +9,7 @@ buildscript{
 
     repositories {
         mavenCentral()
+        gradlePluginPortal()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
@@ -15,13 +20,67 @@ buildscript{
     }
 }
 
-def preinstalledNodeDistributionDirectory = file("${projectDir}/src/main/resources/static/node")
-
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: "com.github.node-gradle.node"
+
+group = 'com.CommunityBlogProject'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-test' // chk , req for testing.
+
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity5', version: '3.0.4.RELEASE'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.3' // chk, req
+
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.4.2'
+
+    compile group: 'org.projectlombok', name: 'lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'mysql:mysql-connector-java'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    // query dsl
+    implementation 'com.querydsl:querydsl-core:4.4.0'
+    implementation 'com.querydsl:querydsl-jpa:4.4.0'
+    annotationProcessor 'com.querydsl:querydsl-apt:4.1.4:jpa' // querydsl JPAAnnotationProcessor
+    // querydsl JPAAnnotationProcessor 을 사용
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+
+    // npm
+//    implementation "com.moowork.gradle:gradle-node-plugin:1.3.1"
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'  // chk
+    testCompile group: 'org.projectlombok', name: 'lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok' // lombok
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.15.3'
+    testImplementation group: 'com.tngtech.archunit', name: 'archunit-junit5-api', version: '0.18.0'
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.15.3'
+}
 
 node {
     version = '11.15.0'
@@ -37,37 +96,6 @@ task copyFrontLib(type: Copy) {
 copyFrontLib.dependsOn npmInstall
 compileJava.dependsOn copyFrontLib
 
-group = 'com.CommunityBlogProject'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-    implementation 'org.projectlombok:lombok:1.18.18'
-    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.4.2'
-
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'org.postgresql:postgresql'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    testCompile('org.projectlombok:lombok')
-    testAnnotationProcessor('org.projectlombok:lombok')
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-}
 
 test {
     useJUnitPlatform()

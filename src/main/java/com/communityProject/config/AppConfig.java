@@ -1,4 +1,4 @@
-package com.CommunityBlogProject.config;
+package com.communityProject.config;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.NameTokenizers;

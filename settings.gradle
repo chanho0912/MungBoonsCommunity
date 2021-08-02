@@ -1,2 +1,3 @@
 rootProject.name = 'CommunityBlogProject'
+include 'java'
 

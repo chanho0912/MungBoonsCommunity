@@ -1,6 +1,6 @@
-package com.CommunityBlogProject.account;
+package com.communityProject.account;
 
-import com.CommunityBlogProject.domain.Account;
+import com.communityProject.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
@@ -70,10 +70,10 @@ public class AccountService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String emailOrNickname) throws UsernameNotFoundException {
         Account account = accountRepository.findByEmail(emailOrNickname);
-        if(account==null) {
+        if(account == null) {
             account = accountRepository.findByNickname(emailOrNickname);
         }
-        if(account==null) {
+        if(account == null) {
             throw new UsernameNotFoundException(emailOrNickname);
         }
         return new UserAccount(account);

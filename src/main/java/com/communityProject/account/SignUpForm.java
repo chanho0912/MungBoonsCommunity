@@ -1,4 +1,4 @@
-package com.CommunityBlogProject.account;
+package com.communityProject.account;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
