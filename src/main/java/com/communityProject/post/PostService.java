@@ -3,19 +3,20 @@ package com.communityProject.post;
 import com.communityProject.domain.Account;
 import com.communityProject.domain.Post;
 import com.communityProject.domain.Tag;
+import com.communityProject.post.form.PostForm;
+import com.communityProject.post.form.PostUpdateForm;
 import com.communityProject.tags.TagRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +47,7 @@ public class PostService {
 
         Post savedPost = postRepository.save(newPost);
         savedPost.setCreatedBy(account);
+        savedPost.setCreatedAt(LocalDateTime.now());
         return savedPost;
     }
 
@@ -61,5 +63,39 @@ public class PostService {
         }
 
         return retList;
+    }
+
+    public Post getPostForUpdate(Account account, Long id) {
+        Post post = getPost(id);
+        if(!account.isManagerOf(post)) {
+            throw new AccessDeniedException("해당 기능을 사용할 수 없습니다.");
+        }
+        return post;
+    }
+
+    public void updatePostContent(Post post, PostUpdateForm postUpdateForm) {
+        modelMapper.map(postUpdateForm, post);
+    }
+
+    public Post getPostForUpdateTag(Account account, Long id) {
+        Post post = postRepository.findPostWithTagsById(id);
+        if(post == null) throw new IllegalArgumentException("해당 post를 찾을 수 없습니다.");
+
+        if(!account.isManagerOf(post)) {
+            throw new AccessDeniedException("해당 기능을 사용할 수 없습니다.");
+        }
+        return post;
+    }
+
+    public void addTag(Post post, Tag tag) {
+        post.getTags().add(tag);
+    }
+
+    public void removeTag(Post post, Tag tag) {
+        post.getTags().remove(tag);
+    }
+
+    public void remove(Post post) {
+        postRepository.delete(post);
     }
 }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: head"></head>
+<body>
+<nav th:replace="fragments.html :: main-nav"></nav>
+<div class="container">
+  <div th:replace="fragments.html :: post-info"></div>
+  <div th:replace="fragments.html :: post-menu(postMenu='settings')"></div>
+  <div class="row mt-3 justify-content-center">
+    <div class="col-2">
+      <div th:replace="fragments.html :: post-settings-menu(currentMenu='post')"></div>
+    </div>
+    <div class="col-8">
+      <div th:replace="fragments.html :: message"></div>
+      <h5 class="col-sm-12 text-danger">게시글 삭제</h5>
+      <form class="col-sm-12" action="#" th:action="@{'/post/' + ${post.getId()} + '/settings/post/remove'}" method="post" novalidate>
+        <div class="alert alert-danger" role="alert">
+          게시글을 삭제 하시겠습니까?
+        </div>
+        <div class="form-group">
+          <button class="btn btn-outline-danger" type="submit" aria-describedby="submitHelp">게시글 삭제</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div th:replace="fragments.html :: footer"></div>
+</div>
+</body>
+</html>

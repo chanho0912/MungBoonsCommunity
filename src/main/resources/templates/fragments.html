@@ -49,7 +49,7 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <form th:action="@{/search/study}" class="form-inline" method="get">
+        <form th:action="@{/search/post}" class="form-inline" method="get">
           <input class="form-control mr-sm-2" name="keyword" type="search" placeholder="게시글 검색" aria-label="Search" />
         </form>
       </li>
@@ -143,12 +143,19 @@
       <i class="fa fa-user"></i> 좋아요!
     </a>
     <a sec:authorize="isAuthenticated()" th:if="${post.isManager(#authentication.principal)}"
-       class="nav-item nav-link" th:classappend="${postMenu == 'settings'}? active" href="#" th:href="@{'/post/' + ${post.id} + '/settings/description'}">
+       class="nav-item nav-link" th:classappend="${postMenu == 'settings'}? active" href="#" th:href="@{'/post/' + ${post.id} + '/settings/update'}">
       <i class="fa fa-cog"></i> 설정
     </a>
   </nav>
 </div>
-
+<div th:fragment="post-settings-menu (currentMenu)" class="list-group">
+  <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'update'}? active"
+     href="#" th:href="@{'/post/' + ${post.id} + '/settings/update'}">소개</a>
+  <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'tags'}? active"
+     href="#" th:href="@{'/post/' + ${post.id} + '/settings/tags'}">게시글 주제</a>
+  <a class="list-group-item list-group-item-action list-group-item-danger" th:classappend="${currentMenu == 'post'}? active"
+     href="#" th:href="@{'/post/' + ${post.id} + '/settings/post-delete'}">게시글 삭제</a>
+</div>
 
 <footer th:fragment="footer">
   <div class="row justify-content-center">
@@ -157,6 +164,121 @@
     <small class="d-block mb-3 text-muted">&copy; 2028</small>
   </div>
 </footer>
+
+<div th:fragment="update-tags (baseUrl)">
+  <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+  <script type="application/javascript" th:inline="javascript">
+        $(function() {
+            function tagRequest(url, tagTitle) {
+                $.ajax({
+                    dataType: "json",
+                    autocomplete: {
+                        enabled: true,
+                        rightKey: true,
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    method: "POST",
+                    url: "[(${baseUrl})]" + url,
+                    data: JSON.stringify({'tagTitle': tagTitle})
+                }).done(function (data, status) {
+                    console.log("${data} and status is ${status}");
+                });
+            }
+
+            function onAdd(e) {
+                tagRequest("/add", e.detail.data.value);
+            }
+
+            function onRemove(e) {
+                tagRequest("/remove", e.detail.data.value);
+            }
+
+            var tagInput = document.querySelector("#tags");
+            var tagify = new Tagify(tagInput, {
+                pattern: /^.{0,20}$/,
+                whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
+                dropdown : {
+                    enabled: 1, // suggest tags after a single character input
+                } // map tags
+            });
+            tagify.on("add", onAdd);
+            tagify.on("remove", onRemove);
+            // add a class to Tagify's input element
+            tagify.DOM.input.classList.add('form-control');
+            // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
+            tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
+        });
+    </script>
+</div>
+
+<div th:fragment="editor-script">
+  <script src="/node_modules/summernote/dist/summernote-bs4.js"></script>
+  <script type="application/javascript">
+        $(function () {
+            $('.editor').summernote({
+                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
+                placeholder: '게시글의 내용에 대해 적어 주세요.',
+                tabsize: 2,
+                height: 300
+            });
+        });
+    </script>
+</div>
+<div th:fragment="message" th:if="${message}" class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+  <span th:text="${message}">완료</span>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div th:fragment="post-list (postList)" class="col-sm-12">
+  <div class="row">
+    <div class="col-md-10 mb-3" th:each="post: ${postList}">
+      <div class="card mb-10 shadow-sm">
+        <div class="card-body">
+          <a th:href="@{'/post/' + ${post.id} + '/details'}" class="text-decoration-none">
+            <h5 class="card-title context" th:text="${post.title}"></h5>
+          </a>
+          <p class="card-text context">
+            <span th:each="tag: ${post.tags}" class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
+              <a th:href="@{'/search/tag/' + ${tag.title}}" class="text-decoration-none text-white">
+                <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
+              </a>
+            </span>
+          </p>
+
+          <div class="createdByDetails row pl-3">
+            <p class="card-text">Created by : </p>
+            <svg th:if="${#strings.isEmpty(post.createdBy?.profileImage)}" th:data-jdenticon-value="${post.createdBy.nickname}" width="24" height="24" class="rounded border bg-light mr-2 ml-2"></svg>
+            <img th:if="${!#strings.isEmpty(post.createdBy?.profileImage)}" th:src="${post.createdBy?.profileImage}" width="24" height="24" class="rounded border mr-2 ml-2"/>
+
+            <p class="card-text" th:text="${post.createdBy.nickname}">Created By</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <small class="text-muted mr-3">
+                <i class="fa fa-comment"></i>
+                <span th:text="${post.commentCount}"></span>개
+              </small>
+              <small class="text-muted mr-3">
+                <i class="fa fa-thumbs-up"></i>
+                <span th:text="${post.likesCount}"></span>명
+              </small>
+              <small class="text-muted">
+                <i class="fa fa-eye"></i>
+                <span th:text="${post.countOfViews}"></span>명
+              </small>
+            </div>
+            <small class="text-muted date" th:text="${post.createdAt}">9 mins</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script type="application/javascript" th:fragment="form-validation">
   (function () {
     'use strict';
@@ -185,17 +307,33 @@
         });
     });
 </script>
-<div th:fragment="editor-script">
-  <script src="/node_modules/summernote/dist/summernote-bs4.js"></script>
+<div th:fragment="date-time">
+  <script src="/node_modules/moment/min/moment-with-locales.min.js"></script>
   <script type="application/javascript">
         $(function () {
-            $('.editor').summernote({
-                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
-                placeholder: '게시글의 내용에 대해 적어 주세요.',
-                tabsize: 2,
-                height: 300
+            moment.locale('ko');
+            $(".date-time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLL');
             });
-        });
+            $(".date").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LL');
+            });
+            $(".weekday").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('dddd');
+            });
+            $(".time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LT');
+            });
+            $(".calendar").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").calendar();
+            });
+            $(".fromNow").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").fromNow();
+            });
+            $(".date-weekday-time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLLL');
+            });
+        })
     </script>
 </div>
 </html>

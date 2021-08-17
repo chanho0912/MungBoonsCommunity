@@ -16,9 +16,6 @@ public class Post {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String path;
-
     @ManyToOne
     private Account createdBy;
 
@@ -36,9 +33,11 @@ public class Post {
     @ManyToMany
     private Set<Tag> tags = new HashSet<>();
 
-    private LocalDateTime publishedDateTime;
+    private LocalDateTime createdAt;
 
-    private Long countOfViews;
+    private int commentCount;
+    private int likesCount;
+    private int countOfViews;
 
     private boolean published; // for hide
 

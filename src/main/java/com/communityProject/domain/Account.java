@@ -71,4 +71,8 @@ public class Account {
     public boolean canSendConfirmEmail() {
         return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
+
+    public boolean isManagerOf(Post post) {
+        return post.getCreatedBy().equals(this);
+    }
 }

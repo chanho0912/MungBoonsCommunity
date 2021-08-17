@@ -22,9 +22,13 @@ public class QPost extends EntityPathBase<Post> {
 
     public static final QPost post = new QPost("post");
 
+    public final NumberPath<Integer> commentCount = createNumber("commentCount", Integer.class);
+
     public final StringPath content = createString("content");
 
-    public final NumberPath<Long> countOfViews = createNumber("countOfViews", Long.class);
+    public final NumberPath<Integer> countOfViews = createNumber("countOfViews", Integer.class);
+
+    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
     public final QAccount createdBy;
 
@@ -32,11 +36,9 @@ public class QPost extends EntityPathBase<Post> {
 
     public final StringPath image = createString("image");
 
-    public final StringPath path = createString("path");
+    public final NumberPath<Integer> likesCount = createNumber("likesCount", Integer.class);
 
     public final BooleanPath published = createBoolean("published");
-
-    public final DateTimePath<java.time.LocalDateTime> publishedDateTime = createDateTime("publishedDateTime", java.time.LocalDateTime.class);
 
     public final SetPath<Tag, QTag> tags = this.<Tag, QTag>createSet("tags", Tag.class, QTag.class, PathInits.DIRECT2);
 

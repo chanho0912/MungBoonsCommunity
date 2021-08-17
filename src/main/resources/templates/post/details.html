@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments.html :: head"></head>
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+<div class="container">
+    <div class="py-5 text-center">
+        <a href="#" class="text-decoration-none" th:href="@{'/post/' + ${post.id}}">
+            <span class="h2" th:text="${post.title}">게시글 제목</span>
+        </a>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-sm-8 text-left">
+            <div class="row bg-light">
+                <p class="lead"></p>
+            </div>
+
+            <p>
+                <span th:each="tag: ${post.tags}" class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
+                    <a th:href="@{'/search/tag/' + ${tag.title}}" class="text-decoration-none text-white">
+                        <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
+                    </a>
+                </span>
+            </p>
+
+            <span class="text-left">
+                <span class="row ml-0">
+                    <span class="text-left text-muted" th:text="${post.createdBy.nickname}">Created By</span>
+                    <small class="text-left ml-2 mr-2 mt-1">|</small>
+                    <span class="text-muted date" th:text="${post.createdAt}">9 mins</span>
+                    <span class="row ml-0" sec:authorize="isAuthenticated()" th:if="${post.isManager(#authentication.principal)}">
+                        <small class="text-left ml-2 mr-2 mt-1">|</small>
+                        <a class="text-decoration-none text-secondary" th:href="@{'/post/' + ${post.id} + '/settings/update'}">수정</a>
+                    </span>
+                </span>
+            </span>
+
+            <hr>
+
+            <div class="row px-3">
+                <div class="pt-3" th:utext="${post.content}"></div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="fragments.html :: footer"></div>
+    <div th:replace="fragments.html :: date-time"></div>
+</div>
+</body>
+</html>
