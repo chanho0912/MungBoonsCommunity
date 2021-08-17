@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: head"></head>
+
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+<div class="container">
+  <div class="py-5 text-center">
+    <h2>게시글 작성</h2>
+  </div>
+  <div class="row justify-content-center">
+    <form class="needs-validation col-sm-10" action="#"
+          th:action="@{/new-post}" th:object="${postForm}" method="post" novalidate>
+
+      <div class="form-group">
+        <label for="title">게시글 제목</label>
+        <input id="title" type="text" th:field="*{title}" class="form-control"
+               placeholder="게시글 제목" aria-describedby="titleHelp" required max="50">
+        <small id="titleHelp" class="form-text text-muted">
+          게시글 제목을 50자 이내로 입력하세요.
+        </small>
+        <small class="invalid-feedback">게시글 저목을 입력하세요.</small>
+        <small class="form-text text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</small>
+      </div>
+
+      <div class="form-group">
+        <label for="content">게시글 내용</label>
+        <textarea id="content" type="textarea" th:field="*{content}" class="editor form-control"
+                  placeholder="게시글의 내용을 입력해 주세요." aria-describedby="contentHelp" required></textarea>
+        <small id="contentHelp" class="form-text text-muted">
+          게시글의 내용에 대해 적어주세요.
+        </small>
+        <small class="invalid-feedback">게시글 내용을 입력하세요.</small>
+        <small class="form-text text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">content Error</small>
+      </div>
+
+      <div class="form-group">
+        <label for="tags">추가하고 싶은 태그를 넣어주세요.</label>
+        <div id="whitelist" th:text="${whitelist}" hidden></div>
+        <input id="tags" type="text" name="tags" th:value="${#strings.listJoin(tags, ',')}"
+               class="tagify-outside" aria-describedby="tagHelp"/>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary btn-block" type="submit"
+                aria-describedby="submitHelp">게시글 생성</button>
+      </div>
+    </form>
+  </div>
+  <div th:replace="fragments.html :: footer"></div>
+</div>
+<div th:replace="fragments.html :: editor-script"></div>
+<script th:replace="fragments.html :: ajax-csrf-header"></script>
+<script th:replace="fragments.html :: form-validation"></script>
+<script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+<script type="application/javascript" th:inline="javascript">
+    $(function() {
+        function tagRequest(url, tagTitle) {
+            $.ajax({
+                dataType: "json",
+                autocomplete: {
+                    enabled: true,
+                    rightKey: true,
+                },
+                contentType: "application/json; charset=utf-8",
+                method: "POST",
+                url: "/post/tags" + url,
+                data: JSON.stringify({'tagTitle': tagTitle})
+            }).done(function (data, status) {
+                console.log("${data} and status is ${status}");
+            });
+        }
+
+        function onAdd(e) {
+            tagRequest("/add", e.detail.data.value);
+        }
+
+        function onRemove(e) {
+            tagRequest("/remove", e.detail.data.value);
+        }
+
+        var tagInput = document.querySelector("#tags");
+        var tagify = new Tagify(tagInput, {
+            pattern: /^.{0,20}$/,
+            whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
+            dropdown : {
+                enabled: 1, // suggest tags after a single character input
+            } // map tags
+        });
+        tagify.on("add", onAdd);
+        tagify.on("remove", onRemove);
+        // add a class to Tagify's input element
+        tagify.DOM.input.classList.add('form-control');
+        // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
+        tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
+    });
+</script>
+
+
+</body>
+</html>

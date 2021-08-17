@@ -4,6 +4,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -11,7 +13,7 @@ import java.util.UUID;
 @Builder @AllArgsConstructor @NoArgsConstructor
 public class Account {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -19,6 +21,9 @@ public class Account {
 
     @Column(unique = true)
     private String nickname;
+
+    @ManyToMany
+    private Set<Tag> tags = new HashSet<>();
 
     private String password;
 

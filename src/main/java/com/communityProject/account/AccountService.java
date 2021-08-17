@@ -1,6 +1,7 @@
 package com.communityProject.account;
 
 import com.communityProject.domain.Account;
+import com.communityProject.domain.Tag;
 import com.communityProject.settings.form.Notifications;
 import com.communityProject.settings.form.Profile;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -32,7 +35,6 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public Account processNewAccount(SignUpForm signUpForm) {
         Account newAccount = saveNewAccount(signUpForm);
-        newAccount.generateEmailCheckToken();
         sendSignUpConfirmEmail(newAccount);
         return newAccount;
     }
@@ -48,16 +50,10 @@ public class AccountService implements UserDetailsService {
     }
 
     private Account saveNewAccount(SignUpForm signUpForm) {
-        Account account = Account.builder()
-                .email(signUpForm.getEmail())
-                .nickname(signUpForm.getNickname())
-                .password(passwordEncoder.encode(signUpForm.getPassword()))
-                .postCreatedByWeb(true)
-                .postEnrollmentResultByWeb(true)
-                .postUpdatedByWeb(true)
-                .build();
-
-        return accountRepository.save(account);
+        signUpForm.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
+        Account newAccount = modelMapper.map(signUpForm, Account.class);
+        newAccount.generateEmailCheckToken();
+        return accountRepository.save(newAccount);
     }
 
     public void login(Account account) {
@@ -109,5 +105,20 @@ public class AccountService implements UserDetailsService {
         account.setNickname(nickname);
         accountRepository.save(account);
         login(account);
+    }
+
+    public Set<Tag> getTags(Account account) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        return byId.orElseThrow().getTags();
+    }
+
+    public void addTag(Account account, Tag tag) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a->a.getTags().add(tag));
+    }
+
+    public void removeTag(Account account, Tag tag) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a->a.getTags().remove(tag));
     }
 }

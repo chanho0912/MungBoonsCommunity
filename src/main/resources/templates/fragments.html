@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans+KR:300,400,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs4.min.css">
+  <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css">
   <script src="/node_modules/jdenticon/dist/jdenticon.min.js"></script>
   <script src="/node_modules/jquery/dist/jquery.min.js"></script>
   <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -17,7 +19,22 @@
         .container {
             max-width: 100%;
         }
+        .tagify-outside{
+            border: 0;
+            padding: 0;
+            margin: 0;
+        }
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        body,
+        input,
+        button,
+        select,
+        optgroup,
+        textarea,
+        .tooltip,
+        .popover {
             font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         }
    </style>
@@ -51,7 +68,7 @@
         </a>
       </li>
       <li class="nav-item" sec:authorize="isAuthenticated()">
-        <a class="nav-link btn btn-outline-primary" th:href="@{/new-study}">
+        <a class="nav-link btn btn-outline-primary" th:href="@{/new-post}">
           <i class="fa fa-plus" aria-hidden="true"></i>게시글 올리기
         </a>
       </li>
@@ -83,10 +100,56 @@
     <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'profile'}? active" href="#" th:href="@{/settings/profile}">프로필</a>
     <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'password'}? active" href="#" th:href="@{/settings/password}">패스워드</a>
     <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'notifications'}? active" href="#" th:href="@{/settings/notifications}">알림</a>
-<!--    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'tags'}? active" href="#" th:href="@{/settings/tags}">관심 주제</a>-->
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'tags'}? active" href="#" th:href="@{/settings/tags}">관심 주제</a>
 <!--    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'zones'}? active" href="#" th:href="@{/settings/zones}">활동 지역</a>-->
     <a class="list-group-item list-group-item-action list-group-item-danger" th:classappend="${currentMenu == 'Account'}? active" href="#" th:href="@{/settings/account}">계정</a>
 </div>
+
+<div th:fragment="post-info">
+  <div class="row pt-4 text-left justify-content-center bg-light">
+    <div class="col-10">
+      <a href="#" class="text-decoration-none" th:href="@{'/post/' + ${post.id}}">
+        <span class="h2" th:text="${post.title}">게시글 제목</span>
+      </a>
+    </div>
+  </div>
+  <div class="row justify-content-center bg-light">
+    <div class="col-10">
+      <p class="lead"></p>
+    </div>
+  </div>
+  <div class="row justify-content-center bg-light">
+    <div class="col-10">
+      <p>
+        <span th:each="tag: ${post.tags}"
+              class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
+          <a th:href="@{'/search/tag/' + ${tag.title}}" class="text-decoration-none text-white">
+            <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
+          </a>
+        </span>
+      </p>
+    </div>
+  </div>
+</div>
+<div th:fragment="post-menu (postMenu)" class="row px-3 justify-content-center bg-light">
+  <nav class="col-10 nav nav-tabs">
+    <a class="nav-item nav-link" href="#" th:classappend="${postMenu == 'info'}? active" th:href="@{'/post/' + ${post.id}}">
+      <i class="fa fa-info-circle"></i> 소개
+    </a>
+    <a class="nav-item nav-link" href="#" th:classappend="${postMenu == 'comments'}? active" th:href="@{'/post/' + ${post.id} + '/comments'}">
+      <i class="fa fa-user"></i> 댓글
+    </a>
+    <a class="nav-item nav-link" th:classappend="${postMenu == 'likes'}? active" href="#" th:href="@{'/post/' + ${post.id} + '/likes'}">
+      <i class="fa fa-user"></i> 좋아요!
+    </a>
+    <a sec:authorize="isAuthenticated()" th:if="${post.isManager(#authentication.principal)}"
+       class="nav-item nav-link" th:classappend="${postMenu == 'settings'}? active" href="#" th:href="@{'/post/' + ${post.id} + '/settings/description'}">
+      <i class="fa fa-cog"></i> 설정
+    </a>
+  </nav>
+</div>
+
+
 <footer th:fragment="footer">
   <div class="row justify-content-center">
     <!--        <img class="mb-2" src="/images/logo_long_kr.jpg" alt="logo_long_kr" width="100" />-->
@@ -113,3 +176,26 @@
     }, false)
   }())
 </script>
+<script type="application/javascript" th:inline="javascript" th:fragment="ajax-csrf-header">
+    $(function() {
+        var csrfToken = /*[[${_csrf.token}]]*/ null;
+        var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
+        $(document).ajaxSend(function (e, xhr, options) {
+            xhr.setRequestHeader(csrfHeader, csrfToken);
+        });
+    });
+</script>
+<div th:fragment="editor-script">
+  <script src="/node_modules/summernote/dist/summernote-bs4.js"></script>
+  <script type="application/javascript">
+        $(function () {
+            $('.editor').summernote({
+                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
+                placeholder: '게시글의 내용에 대해 적어 주세요.',
+                tabsize: 2,
+                height: 300
+            });
+        });
+    </script>
+</div>
+</html>
