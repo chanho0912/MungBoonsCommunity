@@ -75,4 +75,5 @@ public class Account {
     public boolean isManagerOf(Post post) {
         return post.getCreatedBy().equals(this);
     }
+
 }

@@ -24,6 +24,8 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Integer> commentCount = createNumber("commentCount", Integer.class);
 
+    public final SetPath<Comment, QComment> comments = this.<Comment, QComment>createSet("comments", Comment.class, QComment.class, PathInits.DIRECT2);
+
     public final StringPath content = createString("content");
 
     public final NumberPath<Integer> countOfViews = createNumber("countOfViews", Integer.class);

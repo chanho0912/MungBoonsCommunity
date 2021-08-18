@@ -1,9 +1,13 @@
 package com.communityProject.post;
 
 import com.communityProject.account.CurrentUser;
+import com.communityProject.comment.CommentForm;
+import com.communityProject.comment.CommentRepository;
 import com.communityProject.domain.Account;
+import com.communityProject.domain.Comment;
 import com.communityProject.domain.Post;
 import com.communityProject.domain.Tag;
+import com.communityProject.likes.LikesForm;
 import com.communityProject.post.form.PostForm;
 import com.communityProject.tags.TagForm;
 import com.communityProject.tags.TagRepository;
@@ -28,8 +32,12 @@ import java.util.stream.Collectors;
 public class PostController {
     private final PostRepository postRepository;
     private final PostService postService;
+
     private final TagRepository tagRepository;
     private final TagService tagService;
+
+    private final CommentRepository commentRepository;
+
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
 
@@ -82,9 +90,14 @@ public class PostController {
 
     @GetMapping("/post/{postId}/details")
     public String viewPostDetails(@CurrentUser Account account, @PathVariable Long postId, Model model) {
-        Post post = postService.getPost(postId);
+        Post post = postService.getPostForViews(postId);
+        List<Comment> commentList = new ArrayList<>(post.getComments());
+
         model.addAttribute(account);
         model.addAttribute(post);
+        model.addAttribute(new CommentForm());
+        model.addAttribute(new LikesForm());
+        model.addAttribute(commentList);
         return "post/details";
     }
 }

@@ -28,25 +28,71 @@
 
             <span class="text-left">
                 <span class="row ml-0">
-                    <span class="text-left text-muted" th:text="${post.createdBy.nickname}">Created By</span>
-                    <small class="text-left ml-2 mr-2 mt-1">|</small>
+                    <span class="text-left" th:text="${post.createdBy.nickname}">Created By</span>
+                    <small class="text-left ml-2 mr-2 mt-1 text-muted">|</small>
                     <span class="text-muted date" th:text="${post.createdAt}">9 mins</span>
-                    <span class="row ml-0" sec:authorize="isAuthenticated()" th:if="${post.isManager(#authentication.principal)}">
+                    <span class="row ml-0 text-muted" sec:authorize="isAuthenticated()" th:if="${post.isManager(#authentication.principal)}">
                         <small class="text-left ml-2 mr-2 mt-1">|</small>
                         <a class="text-decoration-none text-secondary" th:href="@{'/post/' + ${post.id} + '/settings/update'}">수정</a>
                     </span>
                 </span>
             </span>
 
-            <hr>
+            <hr />
 
             <div class="row px-3">
                 <div class="pt-3" th:utext="${post.content}"></div>
             </div>
+
+            <hr />
+            <form th:action="@{'/likes/add/' + ${post.id}}" method="post" th:object="${likesForm}"
+                  th:if="${post.canLikeThisPost(#authentication.principal)}" novalidate>
+                <div class="form-group col-sm-4" id="likePost" style="margin:0 auto">
+                    <button type="submit" class="btn btn-primary btn-block">
+                        이 글을 추천 하시겠습니까?
+                    </button>
+                </div>
+            </form>
+            <form th:action="@{'/likes/remove/' + ${post.id}}" method="post" th:object="${likesForm}"
+                  th:if="${!post.canLikeThisPost(#authentication.principal)}" novalidate>
+                <div class="form-group col-sm-4" id="removeLikePost" style="margin:0 auto" >
+                    <button type="submit" class="btn btn-primary btn-block">
+                        이 글의 추천을 취소 하시겠습니까?
+                    </button>
+                </div>
+            </form>
+
+            <hr th:if="${post.commentCount > 0}"/>
+            <div class="row justify-content-center">
+                <div th:replace="fragments.html :: comment-list (commentList=${commentList})"></div>
+            </div>
+            <hr />
+
+            <form th:action="@{'/comments/' + ${post.id} + '/add'}" class="needs-validation"
+                  th:object="${commentForm}" method="post" novalidate>
+                <div class="form-group">
+                    <label for="comment">댓글 작성</label>
+                    <textarea id="comment" type="textarea" th:field="*{content}" class="editor form-control"
+                              placeholder="댓글의 내용을 입력해 주세요." aria-describedby="commentHelp" required></textarea>
+                    <small id="commentHelp" class="form-text text-muted">
+                        게시글에 대한 생각을 50자 이내로 적어주세요.
+                    </small>
+                    <small class="invalid-feedback">댓글을 50자 이내로 입력하세요.</small>
+                    <small class="form-text text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">content Error</small>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-primary btn-block" type="submit"
+                            aria-describedby="submitHelp">댓글 달기</button>
+                </div>
+            </form>
         </div>
     </div>
     <div th:replace="fragments.html :: footer"></div>
     <div th:replace="fragments.html :: date-time"></div>
 </div>
+<div th:replace="fragments.html :: click-likes"></div>
+<script th:replace="fragments.html :: ajax-csrf-header"></script>
+<script th:replace="fragments.html :: form-validation"></script>
 </body>
 </html>

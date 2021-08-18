@@ -98,4 +98,17 @@ public class PostService {
     public void remove(Post post) {
         postRepository.delete(post);
     }
+
+    public Post getPostForUpdateLikes(Account account, Long postId) {
+        Optional<Post> post = postRepository.findById(postId);
+        return post.orElseThrow(()->new IllegalArgumentException("잘못된 요청입니다."));
+    }
+
+    public Post getPostForViews(Long postId) {
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) throw new IllegalArgumentException("잘못된 요청입니다.");
+        Post retPost = post.get();
+        retPost.setCountOfViews(retPost.getCountOfViews() + 1);
+        return retPost;
+    }
 }

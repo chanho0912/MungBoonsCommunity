@@ -31,6 +31,9 @@ public class Post {
     private Set<Account> whoLikes = new HashSet<>();
 
     @ManyToMany
+    private Set<Comment> comments = new HashSet<>();
+
+    @ManyToMany
     private Set<Tag> tags = new HashSet<>();
 
     private LocalDateTime createdAt;
@@ -50,5 +53,9 @@ public class Post {
 
     public boolean isManager(UserAccount userAccount) {
         return this.createdBy.getId().equals(userAccount.getAccount().getId());
+    }
+
+    public boolean canLikeThisPost(UserAccount userAccount) {
+        return !(this.getWhoLikes().contains(userAccount.getAccount()));
     }
 }
