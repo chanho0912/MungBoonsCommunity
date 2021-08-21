@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: head"></head>
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+<div class="container">
+    <div th:replace="fragments.html :: post-info"></div>
+    <div th:replace="fragments.html :: post-menu(postMenu='comments')"></div>
+
+    <div class="row mt-2 justify-content-center">
+        <div class="row col-sm-10">
+            <div class="col-md-12 mb-2" th:each="comment: ${commentList}">
+                <div class="card mb-10 shadow-sm">
+                    <div class="card-body">
+                        <div class="createdByDetails row">
+                            <div>
+                                <svg th:if="${#strings.isEmpty(comment.createdBy?.profileImage)}" th:data-jdenticon-value="${comment.createdBy.nickname}" width="42" height="42" class="rounded border bg-light mr-2 ml-2"></svg>
+                                <img th:if="${!#strings.isEmpty(comment.createdBy?.profileImage)}" th:src="${comment.createdBy?.profileImage}" width="42" height="42" class="rounded border mr-2 ml-2"/>
+                            </div>
+
+                            <span class="text-left">
+                                <span class="row ml-0">
+                                    <small class="text-left" th:text="${comment.createdBy.nickname}">Created By</small>
+                                    <small class="text-left ml-2 mr-2 mb-1 text-muted">|</small>
+                                    <small class="text-muted date" th:text="${post.createdAt}">9 mins</small>
+                                    <span class="row ml-0 text-muted">
+                                        <small class="text-left ml-2 mr-2 mb-1">|</small>
+                                        <small class="mb-1">
+                                          <a class="text-decoration-none text-secondary"
+                                             th:href="@{'/comments/delete/' + ${post.id} + '/' + ${comment.id} + '/redirectToSettings'}">
+                                            삭제
+                                          </a>
+                                        </small>
+                                    </span>
+                                </span>
+                                <span class="row ml-0">
+                                    <small class="text-left text-secondary" th:text="${comment.content}">Comment Content</small>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--    <div th:replace="fragments.html :: member-list(members=${study.members},isManager=${false})"></div>-->
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+</body>
+</html>

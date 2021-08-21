@@ -3,6 +3,7 @@ package com.communityProject.post;
 import com.communityProject.domain.Account;
 import com.communityProject.domain.Post;
 import com.communityProject.domain.Tag;
+import com.communityProject.post.event.PostCreatedEvent;
 import com.communityProject.post.form.PostForm;
 import com.communityProject.post.form.PostUpdateForm;
 import com.communityProject.tags.TagRepository;
@@ -12,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Post getPost(Long postId){
         Optional<Post> post = postRepository.findById(postId);
@@ -45,14 +48,18 @@ public class PostService {
             newPost.getTags().add(tag);
         }
 
+        newPost.setCreatedBy(account);
+        newPost.setCreatedAt(LocalDateTime.now());
         Post savedPost = postRepository.save(newPost);
-        savedPost.setCreatedBy(account);
-        savedPost.setCreatedAt(LocalDateTime.now());
+
+        eventPublisher.publishEvent(new PostCreatedEvent(savedPost));
         return savedPost;
     }
 
     private List<String> getTagsFromString(String tags) throws ParseException {
         List<String> retList = new ArrayList<>();
+        if(tags.length() == 0) return retList;
+
         JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = (JSONArray) jsonParser.parse(tags);
 
@@ -78,7 +85,7 @@ public class PostService {
     }
 
     public Post getPostForUpdateTag(Account account, Long id) {
-        Post post = postRepository.findPostWithTagsById(id);
+        Post post = postRepository.findWithTagsById(id);
         if(post == null) throw new IllegalArgumentException("해당 post를 찾을 수 없습니다.");
 
         if(!account.isManagerOf(post)) {

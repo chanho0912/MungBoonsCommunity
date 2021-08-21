@@ -43,4 +43,13 @@ public class CommentController {
         commentService.deleteComment(postId, commentId);
         return "redirect:/post/{postId}/details";
     }
+
+    @GetMapping("/comments/delete/{postId}/{commentId}/redirectToSettings")
+    public String deleteCommentRedirectToSettings(@CurrentUser Account account, @PathVariable Long postId, @PathVariable Long commentId,
+                                Model model) {
+
+        commentService.deleteComment(postId, commentId);
+        return "redirect:/post/{postId}/comments";
+    }
+
 }

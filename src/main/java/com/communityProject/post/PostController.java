@@ -100,4 +100,32 @@ public class PostController {
         model.addAttribute(commentList);
         return "post/details";
     }
+
+    @GetMapping("/post/{postId}/comments")
+    public String viewPostSettingsComments(@CurrentUser Account account, @PathVariable Long postId, Model model) {
+        Post post = postService.getPost(postId);
+        List<Comment> commentList = new ArrayList<>(post.getComments());
+
+        model.addAttribute(account);
+        model.addAttribute(post);
+        model.addAttribute(commentList);
+
+        return "post/settings/post-comments";
+    }
+
+    @GetMapping("/post/{postId}/likes")
+    public String viewPostSettingsLikes(@CurrentUser Account account, @PathVariable Long postId, Model model) {
+        Post post = postService.getPost(postId);
+        List<Account> likesList = new ArrayList<>(post.getWhoLikes());
+
+        System.out.println("likesListCount" + likesList.size());
+        for(Account o : likesList) {
+            System.out.println(o.getId());
+        }
+
+        model.addAttribute(account);
+        model.addAttribute(post);
+        model.addAttribute("likesList", likesList);
+        return "post/settings/post-likes";
+    }
 }

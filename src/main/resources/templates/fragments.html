@@ -64,7 +64,10 @@
       </li>
       <li class="nav-item" sec:authorize="isAuthenticated()">
         <a class="nav-link" th:href="@{/notifications}">
-          <i class="fa fa-bell-o" aria-hidden="true"></i>
+          <i th:if="${!hasNotification}" class="fa fa-bell-o" aria-hidden="true"></i>
+          <span class="text-info">
+            <i th:if="${hasNotification}" class="fa fa-bell" aria-hidden="true"></i>
+          </span>
         </a>
       </li>
       <li class="nav-item" sec:authorize="isAuthenticated()">
@@ -165,36 +168,6 @@
   </div>
 </footer>
 
-<div th:fragment="click-likes">
-  <script type="application/javascript" th:inline="javascript">
-<!--    let likes = {-->
-<!--      addLikes : function(postId) {-->
-<!--        console.log(postId);-->
-<!--        $.ajax({-->
-<!--          type: "POST",-->
-<!--          url: "/likes/add/" + postId,-->
-<!--          dataType: "json"-->
-<!--        }).done(function(resp){-->
-<!--          alert("해당 게시글을 추천 하였습니다.");-->
-<!--          location.href = '/post/' + postId + '/details'-->
-<!--          console.log("좋아요 성공");-->
-<!--        });-->
-<!--      },-->
-
-<!--      removeLikes : function(postId) {-->
-<!--        alert(postId);-->
-<!--        $.ajax({-->
-<!--          type: "GET",-->
-<!--          url: "/likes/remove/[(${postId})]",-->
-<!--          dataType: "json"-->
-<!--        }).done(function(resp){-->
-<!--          console.log("좋아요 취소 성공");-->
-<!--        });-->
-<!--      }-->
-<!--    };-->
-  </script>
-</div>
-
 <div th:fragment="update-tags (baseUrl)">
   <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
   <script type="application/javascript" th:inline="javascript">
@@ -240,7 +213,6 @@
         });
     </script>
 </div>
-
 <div th:fragment="editor-script">
   <script src="/node_modules/summernote/dist/summernote-bs4.js"></script>
   <script type="application/javascript">
@@ -260,7 +232,6 @@
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-
 <div th:fragment="post-list (postList)" class="col-sm-12">
   <div class="row">
     <div class="col-md-10 mb-3" th:each="post: ${postList}">
@@ -308,7 +279,6 @@
     </div>
   </div>
 </div>
-
 <div th:fragment="post-list-for-nonLogin (postList)" class="col-sm-12">
   <div class="row justify-content-center">
     <div class="col-md-10 mb-3" th:each="post: ${postList}">
@@ -356,9 +326,6 @@
     </div>
   </div>
 </div>
-
-
-
 <div th:fragment="comment-list (commentList)" class="col-sm-12">
   <div class="row">
     <div class="col-md-12 mb-2" th:each="comment: ${commentList}">
@@ -399,6 +366,30 @@
     </div>
   </div>
 </div>
+
+<!--<div th:fragment="comment-list (comments)" class="row px-3 justify-content-center">-->
+<!--  <ul class="list-unstyled col-10">-->
+<!--    <li class="media mt-3" th:each="comment: ${comments}">-->
+<!--      <svg th:if="${#strings.isEmpty(comment.createdBy?.profileImage)}" th:data-jdenticon-value="${comment.createdBy.nickname}" width="64" height="64" class="rounded border bg-light mr-3"></svg>-->
+<!--      <img th:if="${!#strings.isEmpty(comment.createdBy?.profileImage)}" th:src="${comment.createdBy?.profileImage}" width="64" height="64" class="rounded border mr-3"/>-->
+<!--&lt;!&ndash;      <div class="media-body">&ndash;&gt;-->
+<!--&lt;!&ndash;        <h5 class="mt-0 mb-1"><span th:text="${member.nickname}"></span> <span th:if="${isManager}" class="badge badge-primary">관리자</span></h5>&ndash;&gt;-->
+<!--&lt;!&ndash;        <span th:text="${member.bio}"></span>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--    </li>-->
+<!--  </ul>-->
+<!--</div>-->
+
+<ul th:fragment="notification-list (notifications)" class="list-group list-group-flush">
+  <a href="#" th:href="@{${noti.link}}" th:each="noti: ${notifications}"
+     class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <small class="text-muted" th:text="${noti.title}">Noti title</small>
+      <small class="fromNow text-muted" th:text="${noti.createdAt}">3 days ago</small>
+    </div>
+    <p th:text="${noti.message}" class="text-left mb-0 mt-1">message</p>
+  </a>
+</ul>
 
 <script type="application/javascript" th:fragment="form-validation">
   (function () {

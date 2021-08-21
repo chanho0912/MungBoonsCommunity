@@ -37,4 +37,12 @@ public class MainController {
     public String login() {
         return "login";
     }
+
+    @GetMapping("/search/post")
+    public String searchPost(String keyword, Model model) {
+        List<Post> postList = postRepository.findByKeyword(keyword);
+        model.addAttribute(postList);
+        model.addAttribute("keyword", keyword);
+        return "search";
+    }
 }

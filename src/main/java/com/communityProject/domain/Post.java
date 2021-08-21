@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@NamedEntityGraph(name="Post.withTags", attributeNodes = {
+        @NamedAttributeNode("tags")
+})
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
 @NoArgsConstructor @AllArgsConstructor
@@ -57,5 +60,14 @@ public class Post {
 
     public boolean canLikeThisPost(UserAccount userAccount) {
         return !(this.getWhoLikes().contains(userAccount.getAccount()));
+    }
+
+    public void addLikesToPost(Account account) {
+        this.whoLikes.add(account);
+        this.likesCount = this.getWhoLikes().size();
+    }
+    public void deleteLikesToPost(Account account) {
+        this.whoLikes.remove(account);
+        this.likesCount = this.getWhoLikes().size();
     }
 }
