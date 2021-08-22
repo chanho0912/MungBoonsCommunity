@@ -30,15 +30,11 @@ import java.util.stream.Collectors;
 @Controller
 @RequiredArgsConstructor
 public class PostController {
-    private final PostRepository postRepository;
     private final PostService postService;
 
-    private final TagRepository tagRepository;
     private final TagService tagService;
+    private final TagRepository tagRepository;
 
-    private final CommentRepository commentRepository;
-
-    private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
 
     /*
@@ -127,5 +123,11 @@ public class PostController {
         model.addAttribute(post);
         model.addAttribute("likesList", likesList);
         return "post/settings/post-likes";
+    }
+
+    @GetMapping("/post/test")
+    public String generateTestData(@CurrentUser Account account) throws ParseException {
+        postService.generateTestPost(account);
+        return "redirect:/";
     }
 }

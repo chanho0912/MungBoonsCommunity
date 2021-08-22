@@ -8,6 +8,7 @@ import com.communityProject.post.form.PostForm;
 import com.communityProject.post.form.PostUpdateForm;
 import com.communityProject.tags.TagRepository;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.utility.RandomString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,5 +119,16 @@ public class PostService {
         Post retPost = post.get();
         retPost.setCountOfViews(retPost.getCountOfViews() + 1);
         return retPost;
+    }
+
+    public void generateTestPost(Account account) throws ParseException {
+        for(int i = 0; i < 30; i++) {
+            String randomValue = RandomString.make(5);
+            PostForm postForm = new PostForm("테스트 스터디 " + randomValue, "테스트용 post 입니다.", "");
+            Post post = this.createNewPost(postForm, account);
+            Tag Spring = tagRepository.findByTitle("Spring").orElseGet(()->
+                    tagRepository.save(Tag.builder().title("Spring").build()));
+            post.getTags().add(Spring);
+        }
     }
 }

@@ -20,11 +20,32 @@
         </li>
       </ul>
     </div>
-    <div class="col-md-10">
+    <div class="col-md-7">
       <div class="row justify-content-center px-3">
         <div th:replace="fragments.html :: post-list (postList=${postList})"></div>
       </div>
     </div>
+
+    <div class="col-md-3">
+      <h5 class="font-weight-light" th:if="${#lists.isEmpty(postManagerOf)}">최근에 작성하신 게시글이 없습니다.</h5>
+      <h5 class="font-weight-light" th:if="${!#lists.isEmpty(postManagerOf)}">최근 나의 게시글</h5>
+      <div class="list-group" th:if="${!#lists.isEmpty(postManagerOf)}">
+        <a href="#" th:href="@{'/post/' + ${post.id} + '/details'}" th:text="${post.title}"
+           class="list-group-item list-group-item-action" th:each="post: ${postManagerOf}">
+          Post title
+        </a>
+      </div>
+
+      <h5 class="font-weight-light mt-3" th:if="${#lists.isEmpty(postByFavoriteTag)}">관심 주제의 게시글이 없습니다.</h5>
+      <h5 class="font-weight-light mt-3" th:if="${!#lists.isEmpty(postByFavoriteTag)}">관심 주제의 최근 게시글</h5>
+      <div class="list-group" th:if="${!#lists.isEmpty(postByFavoriteTag)}">
+        <a href="#" th:href="@{'/post/' + ${post.id} + '/details'}" th:text="${post.title}"
+           class="list-group-item list-group-item-action" th:each="post: ${postByFavoriteTag}">
+          Post title
+        </a>
+      </div>
+    </div>
+
   </div>
 </div>
 

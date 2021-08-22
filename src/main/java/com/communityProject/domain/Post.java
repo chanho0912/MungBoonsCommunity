@@ -13,7 +13,7 @@ import java.util.Set;
 })
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor @AllArgsConstructor @Builder
 public class Post {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

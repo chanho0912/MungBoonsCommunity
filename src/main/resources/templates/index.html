@@ -5,20 +5,25 @@
 
 <body class="bg-light">
 <div th:replace="fragments.html :: main-nav"></div>
-<div class="alert alert-warning" role="alert" th:if="${account != null && !account.emailVerified}">
-  커뮤니티 블로그 가입을 완료하려면 <a href="#" th:href="@{/check-email}" class="alert-ling">계정 인증 이메일을 확인</a>하세요.
-</div>
-<div class="container">
-    <div class="row justify-content-center pt-3">
-        <div th:replace="fragments.html :: post-list-for-nonLogin (postList=${postList})"></div>
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1>멍뷰니티</h1>
+            <p class="lead text-muted">
+                #해쉬태그 기반 게시글을 생성하시고, 소통해보세요! <br />
+                기본적인 커뮤니티 기능을 제공합니다.
+            </p>
+            <p>
+                <a th:href="@{/signup}" class="btn btn-primary my-2">회원 가입</a>
+            </p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="row justify-content-center pt-3">
+            <div th:replace="fragments.html :: post-list-for-nonLogin (postList=${postList})"></div>
+        </div>
+        <div th:replace="fragments.html :: footer"></div>
+        <div th:replace="fragments.html :: date-time"></div>
     </div>
-    <div th:replace="fragments.html :: footer"></div>
-</div>
-<!--<div class="container">-->
-<!--    <div class="py-5 text-center">-->
-<!--        <h2>Community Developed By Spring</h2>-->
-<!--    </div>-->
-<!--    <div th:replace="fragments.html :: footer"></div>-->
-<!--</div>-->
 </body>
 </html>

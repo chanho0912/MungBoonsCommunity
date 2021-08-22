@@ -7,6 +7,10 @@ import com.communityProject.domain.Post;
 import com.communityProject.post.PostRepository;
 import com.communityProject.post.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,14 +26,15 @@ public class MainController {
 
     @GetMapping("/")
     public String goHome(@CurrentUser Account account, Model model) {
+        model.addAttribute("postList", postRepository.findFirst9ByOrderByCreatedAtDesc());
         if(account != null) {
             Account accountLoaded = accountRepository.findAccountWithTagsById(account.getId());
             model.addAttribute(accountLoaded);
-            model.addAttribute("postList", postRepository.findAll());
+            model.addAttribute("postManagerOf", postRepository.findFirst5ByCreatedByOrderByCreatedAtDesc(accountLoaded));
+            model.addAttribute("postByFavoriteTag", postRepository.findByTags(accountLoaded.getTags()));
             return "index-after-login";
         }
 
-        model.addAttribute("postList", postRepository.findAll());
         return "index";
     }
 
@@ -39,10 +44,15 @@ public class MainController {
     }
 
     @GetMapping("/search/post")
-    public String searchPost(String keyword, Model model) {
-        List<Post> postList = postRepository.findByKeyword(keyword);
-        model.addAttribute(postList);
+    public String searchPost(@PageableDefault(size = 9, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                             @CurrentUser Account account, String keyword, Model model) {
+        if(account != null) {
+            model.addAttribute(account);
+        }
+        Page<Post> postList = postRepository.findByKeyword(keyword, pageable);
+        model.addAttribute("postPage", postList);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("sortProperty", pageable.getSort().toString().contains("createdAt") ? "createdAt" : "likesCount");
         return "search";
     }
 }

@@ -37,6 +37,25 @@
         .popover {
             font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         }
+        table th {
+            font-weight: lighter;
+        }
+
+        mark {
+            padding: 0;
+            background: transparent;
+            background: linear-gradient(to right, #f0ad4e 50%, transparent 50%);
+            background-position: right bottom;
+            background-size: 200% 100%;
+            transition: all .5s ease;
+            color: #fff;
+        }
+
+        mark.animate {
+            background-position: left bottom;
+            color: #000;
+        }
+
    </style>
 </head>
 <nav th:fragment="main-nav" class="navbar navbar-expand-sm navbar-dark bg-dark">
@@ -234,7 +253,7 @@
 </div>
 <div th:fragment="post-list (postList)" class="col-sm-12">
   <div class="row">
-    <div class="col-md-10 mb-3" th:each="post: ${postList}">
+    <div class="col-md-12 mb-3" th:each="post: ${postList}">
       <div class="card mb-10 shadow-sm">
         <div class="card-body">
           <a th:href="@{'/post/' + ${post.id} + '/details'}" class="text-decoration-none">
