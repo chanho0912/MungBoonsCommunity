@@ -15,8 +15,9 @@
         <li class="list-group-item" th:each="tag: ${account.tags}">
           <i class="fa fa-tag"></i> <span th:text="${tag.title}"></span>
         </li>
-        <li class="list-group-item" th:if="${account.tags.size() == 0}">
-          <a th:href="@{/settings/tags}" class="btn-text">관심 주제</a>를 등록하세요.
+<!--        th:if="${account.tags.size() == 0}"-->
+        <li class="list-group-item">
+          <a th:href="@{/settings/tags}" class="btn-text">관심 주제</a>를 설정하세요.
         </li>
       </ul>
     </div>

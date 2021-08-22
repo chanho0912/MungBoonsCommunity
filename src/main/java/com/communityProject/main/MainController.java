@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -53,6 +54,20 @@ public class MainController {
         model.addAttribute("postPage", postList);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sortProperty", pageable.getSort().toString().contains("createdAt") ? "createdAt" : "likesCount");
+        return "search";
+    }
+
+    @GetMapping("search/tag/{keyword}")
+    public String searchTag(@PageableDefault(size = 9, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                            @PathVariable String keyword, @CurrentUser Account account, Model model) {
+        if(account != null) {
+            model.addAttribute(account);
+        }
+        Page<Post> postList = postRepository.findByKeyword(keyword, pageable);
+        model.addAttribute("postPage", postList);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sortProperty", pageable.getSort().toString().contains("createdAt") ? "createdAt" : "likesCount");
+
         return "search";
     }
 }

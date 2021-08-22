@@ -42,7 +42,7 @@
               </a>
               <p class="card-text context">
                 <span th:each="tag: ${post.tags}" class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
-                  <a th:href="@{'search/tag/' + ${tag.title}}" class="text-decoration-none text-white">
+                  <a th:href="@{'/search/tag/' + ${tag.title}}" class="text-decoration-none text-white">
                     <i class="fa fa-tag"> <span th:text="${tag.title}">Tag</span></i>
                   </a>
                 </span>
