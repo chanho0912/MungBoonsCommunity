@@ -1,6 +1,8 @@
 package com.communityProject.account;
 
 import com.communityProject.domain.Account;
+import com.communityProject.mail.EmailMessage;
+import com.communityProject.mail.EmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,7 @@ class AccountControllerTest {
     AccountRepository accountRepository;
 
     @MockBean
-    JavaMailSender javaMailSender;
+    EmailService emailService;
 
     @BeforeEach
     public void beforeEach() { }
@@ -104,20 +106,20 @@ class AccountControllerTest {
     @Test
     public void signUpSubmitWithProperInput() throws Exception {
         mockMvc.perform(post("/sign-up")
-                .param("nickname", "kimchanho")
+                .param("nickname", "abcdefghij")
                 .param("email", "email@naver.com")
                 .param("password", "1234567890")
                 .with(csrf())) // 이 부분을 넣어줘야함
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/"))
-                .andExpect(authenticated().withUsername("kimchanho"));
+                .andExpect(authenticated().withUsername("abcdefghij"));
 
         Account account = accountRepository.findByEmail("email@naver.com");
 
         assertNotNull(account);
         assertNotEquals(account.getPassword(), "1234567890");
         assertNotNull(account.getEmailCheckToken());
-        then(javaMailSender).should().send(any(SimpleMailMessage.class));
+        then(emailService).should().sendEmail(any(EmailMessage.class));
     }
 }

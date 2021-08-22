@@ -2,12 +2,16 @@ package com.communityProject.account;
 
 import com.communityProject.domain.Account;
 import com.communityProject.domain.Tag;
+import com.communityProject.mail.EmailMessage;
+import com.communityProject.mail.EmailService;
 import com.communityProject.settings.form.Notifications;
 import com.communityProject.settings.form.Profile;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,20 +21,26 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
-    private final JavaMailSender javaMailSender;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final TemplateEngine templateEngine;
 
     @Transactional
     public Account processNewAccount(SignUpForm signUpForm) {
@@ -40,13 +50,23 @@ public class AccountService implements UserDetailsService {
     }
 
     private void sendSignUpConfirmEmail(Account newAccount) {
-        newAccount.generateEmailCheckToken();
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(newAccount.getEmail());
-        mailMessage.setSubject("멍분이의 커뮤니티, 회원 가입 인증");
-        mailMessage.setText("/check-email-token?token=" + newAccount.getEmailCheckToken() +
+        Context context = new Context();
+        context.setVariable("link", "/check-email-token?token=" + newAccount.getEmailCheckToken() +
                 "&email="+ newAccount.getEmail());
-        javaMailSender.send(mailMessage);
+        context.setVariable("nickname", newAccount.getNickname());
+        context.setVariable("linkName", "이메일 인증하기");
+        context.setVariable("message", "멍분이의 커뮤니티 서비스를 사용하려면 링크를 클릭하세요.");
+        context.setVariable("host", "http://localhost:8000");
+
+        String message = templateEngine.process("mail/simple-link", context);
+
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(newAccount.getEmail())
+                .subject("멍분이의 커뮤니티, 회원 가입 인증")
+                .message(message)
+                .build();
+
+        emailService.sendEmail(emailMessage);
     }
 
     private Account saveNewAccount(SignUpForm signUpForm) {
