@@ -4,7 +4,7 @@
 ## How to run Program
 
 ### SPEC
-* Using Only jdk-11
+* jdk-11
 * Gradle-6.8
 
 
