@@ -1,9 +1,9 @@
-# SpringMVCCommunity
+# 멍분이의 커뮤니티
 
 
 ## How to run Program
 
-
+### SPEC
 * Using Only jdk-11
 * Gradle-6.8
 
