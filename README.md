@@ -45,3 +45,21 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 * if you want to use google email. then you need to 2 step sequrity.
 * and then you can use app password.
 * write your email and app password.
+
+## FrontEnd Library
+* bootstrap
+* cropper
+* font-awesome
+* jdenticon
+* jquery
+* jquery-cropper
+
+### version info
+```
+"bootstrap": "^4.4.1",
+"cropper": "^4.1.0",
+"font-awesome": "^4.7.0",
+"jdenticon": "^2.2.0",
+"jquery": "^3.4.1",
+"jquery-cropper": "^1.0.1"
+```
