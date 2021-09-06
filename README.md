@@ -24,7 +24,7 @@ spring.datasource.username={your database username}
 spring.datasource.password={your database password}
 ```
 
-* in my case, I use Mysql. if you don't want to use Mysql... also change spring.datasource.driver-class-name=your database Driver...
+* in my case, I use MySQL. if you don't want to use MySQL, also change spring.datasource.driver-class-name=your database Driver...
 
 
 ## How to use EmailService
@@ -41,8 +41,8 @@ spring.mail.properties.mail.smtp.timeout=5000
 spring.mail.properties.mail.smtp.starttls.enable=true
 ```
 
-* in My case. I use google email. 
-* if you want to use google email. then you need to 2 step sequrity.
+* in my case. I use google email. 
+* if you want to use google email. then you need to 2 step security.
 * and then you can use app password.
 * write your email and app password.
 
