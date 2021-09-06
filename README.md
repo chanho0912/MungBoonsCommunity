@@ -3,7 +3,7 @@
 
 ## How to run Program
 
-### SPEC
+### environment
 * jdk-11
 * Gradle-6.8
 
