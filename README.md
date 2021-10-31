@@ -1,5 +1,12 @@
 # 멍분이의 커뮤니티
 
+## Tech
+* Spring Boot
+* MySQL
+* Thymeleaf
+
+## About
+* 간단한 관심 주제 기반 커뮤니티 사이트를 개발하였습니다.
 
 ## How to run Program
 
@@ -12,6 +19,24 @@ Clone the code.
 ```
 gradlew build
 ```
+## UI/UX
+### Main Page
+<img src="https://user-images.githubusercontent.com/53031059/139574832-cdc732c3-0f57-490e-9fb9-dc9308a873b6.png" height="100%" width="100%">
+
+### Search Page
+<img src="https://user-images.githubusercontent.com/53031059/139574862-937d7af3-f24c-4489-987b-6b8f77be3ad7.png" height="100%" width="100%">
+
+### Profile (관심 주제 변경)
+<img src="https://user-images.githubusercontent.com/53031059/139574896-a767e798-2863-4301-905a-3512bcad1607.png" height="100%" width="100%">
+
+### Notification
+<img src="https://user-images.githubusercontent.com/53031059/139574907-fb7e607d-4d5c-47cb-a168-92fd075c27c4.png" height="100%" width="100%">
+
+
+### SignUp, Login
+<img src="https://user-images.githubusercontent.com/53031059/139574912-fe707003-0d66-4747-a5aa-7ee80d4f7016.png" height="100%" width="100%">
+<img src="https://user-images.githubusercontent.com/53031059/139574920-cb617ed7-941e-4bf9-b501-cc62077bee57.png" height="100%" width="100%">
+
 
 ## How to connect Database
 * in SpringMVCCommunity/src/main/resources/application.properties
@@ -53,6 +78,30 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 * jdenticon
 * jquery
 * jquery-cropper
+
+## Asynchronous Infra
+```java
+@Slf4j
+@Configuration
+@EnableAsync
+public class AsyncConfig implements AsyncConfigurer {
+
+    @Override
+    public Executor getAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        int processors = Runtime.getRuntime().availableProcessors();
+        log.info("creating pool with core count {}", processors);
+
+        executor.setCorePoolSize(processors);
+        executor.setMaxPoolSize(processors * 2);
+        executor.setQueueCapacity(50);
+        executor.setKeepAliveSeconds(60);
+        executor.setThreadNamePrefix("AsyncExecutor-");
+        executor.initialize();
+        return executor;
+    }
+}
+```
 
 ### version info
 ```
